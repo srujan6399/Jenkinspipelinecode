@@ -1,0 +1,28 @@
+@NonCPS
+def jsonParse(def json) {
+ new groovy.json.JsonSlurperClassic().parseText(json)
+}
+
+node{
+    stage("test"){
+        
+      def response = httpRequest ignoreSslErrors:true, authentication: 'sonar',  url: 'http://localhost:9000/api/issues/search'
+      def re= jsonParse(response.content);   
+      println(re.issues);
+
+      String rows="";
+    for (int i=0; i<re.issues.size(); i++) {
+        rows=rows+"<tr><td>"+re.issues[i].rule+"</td></tr>";
+        
+    }
+    //Groovy to HTML
+    
+    def file = new File('report.html')
+    
+    file.withWriter('UTF-8') {
+    writer.write('<html><body> <table></table>  </body></html>')
+}
+        
+        
+    }
+}
