@@ -1,28 +1,39 @@
 @NonCPS
-def jsonParse(def json) {
- new groovy.json.JsonSlurperClassic().parseText(json)
+def 
+jsonParse(def json) {
+ 
+	new groovy.json.JsonSlurperClassic().parseText(json)
+
 }
+
+
 
 node{
-    stage("test"){
+    
+	stage("test"){
         
-      def response = httpRequest ignoreSslErrors:true, authentication: 'sonar',  url: 'http://localhost:9000/api/issues/search'
-      def re= jsonParse(response.content);   
-      println(re.issues);
+      
+	def response = httpRequest ignoreSslErrors:true, authentication: 'sonar',  url: 'http://localhost:9000/api/issues/search'
+      
+	def re= jsonParse(response.content);   
+      
+	println(re.issues);
+      
+      
+	String rows="";
+      
+      
+	for (int i=0; i<re.issues.size(); i++) {
+          
+		rows=rows+"<tr><td>"+re.issues[i].message+"</td><td>"+re.issues[i].key+"</td></tr>"
+      
+	}
+      
+      
+	writeFile file: 'report.html', text: '<html><body><table border="3">'+rows+'</table></body></html>'
 
-      String rows="";
-    for (int i=0; i<re.issues.size(); i++) {
-        rows=rows+"<tr><td>"+re.issues[i].rule+"</td></tr>";
-        
-    }
-    //Groovy to HTML
+      
     
-    def file = new File('report.html')
-    
-    file.withWriter('UTF-8') {
-    writer.write('<html><body> <table></table>  </body></html>')
-}
-        
-        
     }
+
 }
