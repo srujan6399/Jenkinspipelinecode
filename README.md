@@ -1,1 +1,1 @@
-# Jenkinspipelinecode
+# Common Jenkins Script
